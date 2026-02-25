@@ -7,7 +7,7 @@ from os import execl as osexecl
 from subprocess import run as srun
 from sys import executable
 from time import time
-
+from Nectar import update_from_upstream
 from psutil import (boot_time, cpu_count, cpu_percent, disk_usage,
                     net_io_counters, swap_memory, virtual_memory)
 from pyrogram import Client, filters
@@ -173,17 +173,21 @@ async def font_message(app, message):
     finally:
         osexecl(executable, executable, "-m", "VideoEncoder")
 
-
 @Client.on_message(filters.command('update'))
 async def update_message(app, message):
     c = await check_chat(message, chat='Sudo')
     if not c:
         return
+
     await AddUserToDatabase(app, message)
+
     reply = await message.reply_text('📶 Fetching Update...')
-    textx = f"✅ Bot Updated"
+
+    updated = update_from_upstream()
+
+    if updated:
+        textx = "✅ Bot Updated & Restarted"
+    else:
+        textx = "⚠️ Update failed or no upstream defined\nCheck log.txt"
+
     await reply.edit_text(textx)
-    try:
-        await app.stop()
-    finally:
-        srun([f"bash run.sh"], shell=True)
