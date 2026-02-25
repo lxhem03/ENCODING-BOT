@@ -4,15 +4,18 @@ import logging
 from subprocess import run as srun
 from os import path as ospath
 from os import execl as osexecl
+from os import getenv
+from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 
 def update_from_upstream():
-    config = load_config_env()
+    if os.path.exists('config.env'):
+        load_dotenv('config.env')
 
-    UPSTREAM_REPO = config.get("UPSTREAM_REPO", "").strip()
-    UPSTREAM_BRANCH = config.get("UPSTREAM_BRANCH", "main").strip()   # change default if needed
-    UPSTREAM_TOKEN = config.get("UPSTREAM_TOKEN", "").strip()         # optional: for private repos
+    UPSTREAM_REPO = getenv("UPSTREAM_REPO")
+    UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH")
+    UPSTREAM_TOKEN = getenv("ACCESS_TOKEN")
 
     if not UPSTREAM_REPO:
         logger.info("No UPSTREAM_REPO in config.env → skipping update")
